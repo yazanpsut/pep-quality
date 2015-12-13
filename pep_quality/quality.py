@@ -58,13 +58,13 @@ def _count_pylint_violations(report_file):
     return num_violations_report
 
 
-def _get_pep8_violations(report_path):
+def _get_pep8_violations(root_path):
     """
     Runs pep8. Returns a tuple of (number_of_violations, violations_string)
     where violations_string is a string of all pep8 violations found, separated
     by new lines.
     """
-    report_dir = (report_path / 'pep8')
+    report_dir = (root_path / 'pep8')
     report_dir.rmtree(ignore_errors=True)
     report_dir.makedirs_p()
 
@@ -72,7 +72,7 @@ def _get_pep8_violations(report_path):
     # Env.METRICS_DIR.makedirs_p()
 
     sh(
-        'pep8 ' + report_dir + ' --max-line-length=120 --exclude="*migrations*,dev/*"  | tee {report_dir}/pep8.report -a '.format(
+        'pep8 ' + root_path + ' --max-line-length=120 --exclude="*migrations*,dev/*"  | tee {report_dir}/pep8.report -a '.format(
             report_dir=report_dir))
 
     count, violations_list = _pep8_violations(
