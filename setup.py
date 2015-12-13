@@ -29,8 +29,8 @@ setup(
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/pypa/sampleproject',
-
+    url='http://yazanpsut.github.io/pep-quality/',
+    download_url='https://github.com/yazanpsut/pep-quality/zipball/master',
     # Author details
     author='Yazan Alhorani',
     author_email='yazan_alhorani@hotmail.com',

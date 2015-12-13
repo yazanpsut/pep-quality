@@ -4,20 +4,19 @@ Check code quality using pep8, pylint, and diff_quality.
 import os
 import re
 
-from path import Path as path
 from paver.easy import sh, BuildFailure
 
 
-class EnvClass(object):
-    ROOT_DIR = None
-    REPORT_DIR = None
-    METRICS_DIR = None
+# class EnvClass(object):
+#     ROOT_DIR = None
+#     REPORT_DIR = None
+#     METRICS_DIR = None
 
 
-Env = EnvClass()
-Env.ROOT_DIR = path(__file__).abspath().parent.parent
-Env.REPORT_DIR = Env.ROOT_DIR / path(__file__).abspath().parent / 'reports'
-Env.METRICS_DIR = Env.ROOT_DIR / path(__file__).abspath().parent / 'metrics'
+# Env = EnvClass()
+# Env.ROOT_DIR = path(__file__).abspath().parent.parent
+# Env.REPORT_DIR = Env.ROOT_DIR / path(__file__).abspath().parent / 'reports'
+# Env.METRICS_DIR = Env.ROOT_DIR / path(__file__).abspath().parent / 'metrics'
 
 
 def top_python_dirs(dirname):
@@ -59,18 +58,18 @@ def _count_pylint_violations(report_file):
     return num_violations_report
 
 
-def _get_pep8_violations():
+def _get_pep8_violations(report_path):
     """
     Runs pep8. Returns a tuple of (number_of_violations, violations_string)
     where violations_string is a string of all pep8 violations found, separated
     by new lines.
     """
-    report_dir = (Env.REPORT_DIR / 'pep8')
+    report_dir = (report_path / 'pep8')
     report_dir.rmtree(ignore_errors=True)
     report_dir.makedirs_p()
 
     # Make sure the metrics subdirectory exists
-    Env.METRICS_DIR.makedirs_p()
+    # Env.METRICS_DIR.makedirs_p()
 
     sh(
         'pep8 . --max-line-length=120 --exclude="*migrations*,dev/*"  | tee {report_dir}/pep8.report -a '.format(
@@ -147,8 +146,11 @@ def _get_count_from_last_line(filename, file_type):
         return None
 
 
-def run_quality(options):
-    dquality_dir = (Env.REPORT_DIR / "diff_quality").makedirs_p()
+def run_quality(output_path, options):
+    """
+    output_path: expects the output path of the the type Path.py
+    """
+    dquality_dir = (output_path / "diff_quality").makedirs_p()
 
     # Save the pass variable. It will be set to false later if failures are detected.
     diff_quality_percentage_pass = True
@@ -189,7 +191,7 @@ def run_quality(options):
         return ''.join(lines)
 
     # Run pep8 directly since we have 0 violations on master
-    (count, violations_list) = _get_pep8_violations()
+    (count, violations_list) = _get_pep8_violations(output_path)
 
     # Print number of violations to log
     print _pep8_output(count, violations_list)
@@ -218,9 +220,9 @@ def run_quality(options):
     # If pylint reports exist, use those
     # Otherwise, `diff-quality` will call pylint itself
 
-    pylint_files = get_violations_reports("pylint")
+    pylint_files = get_violations_reports(output_path, "pylint")
     pylint_reports = u' '.join(pylint_files)
-    jshint_files = get_violations_reports("jshint")
+    jshint_files = get_violations_reports(output_path, "jshint")
     jshint_reports = u' '.join(jshint_files)
 
     # run diff-quality for pylint.
@@ -228,9 +230,8 @@ def run_quality(options):
     # If one of the quality runs fails, then paver exits with an error when it is finished
 
 
-def run_diff_quality(
-        violations_type=None, prefix=None, reports=None, percentage_string=None, branch_string=None, dquality_dir=None
-):
+def run_diff_quality(violations_type=None, prefix=None, reports=None, percentage_string=None, branch_string=None,
+                     dquality_dir=None):
     """
     This executes the diff-quality commandline tool for the given violation type (e.g., pylint, jshint).
     If diff-quality fails due to quality issues, this method returns False.
@@ -269,16 +270,13 @@ def is_percentage_failure(error_message):
         return True
 
 
-def get_violations_reports(violations_type):
+def get_violations_reports(report_path, violations_type):
     """
     Finds violations reports files by naming convention (e.g., all "pep8.report" files)
     """
     violations_files = []
-    for subdir, _dirs, files in os.walk(os.path.join(Env.REPORT_DIR)):
+    for subdir, _dirs, files in os.walk(os.path.join(report_path)):
         for f in files:
             if f == "{violations_type}.report".format(violations_type=violations_type):
                 violations_files.append(os.path.join(subdir, f))
     return violations_files
-
-
-print run_quality(None)
