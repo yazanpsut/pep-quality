@@ -72,7 +72,7 @@ def _get_pep8_violations(report_path):
     # Env.METRICS_DIR.makedirs_p()
 
     sh(
-        'pep8 . --max-line-length=120 --exclude="*migrations*,dev/*"  | tee {report_dir}/pep8.report -a '.format(
+        'pep8 ' + report_dir + ' --max-line-length=120 --exclude="*migrations*,dev/*"  | tee {report_dir}/pep8.report -a '.format(
             report_dir=report_dir))
 
     count, violations_list = _pep8_violations(

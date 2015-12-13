@@ -19,11 +19,11 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='pep_quality',
-
+    packages=['pep_quality'],
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='1.0.0',
+    version='1.0.5',
 
     description='PEP8 small quality test',
     long_description=long_description,
@@ -70,5 +70,8 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=['paver', 'Path.py'],
+    package_data={
+        'pep_quality': ['quality.py'],
+    },
 
 )
