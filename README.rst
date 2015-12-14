@@ -22,3 +22,15 @@ from pep_quality.quality import run_quality
 
 run_quality(path(__file__).abspath(), None)
 "
+
+or you can just call from python manage.py shell like:
+
+"
+from path import Path as path
+
+from pep_quality.quality import run_quality
+
+...
+
+run_quality(path('.').abspath(), None)
+"
